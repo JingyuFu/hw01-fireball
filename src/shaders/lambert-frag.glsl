@@ -1,43 +1,29 @@
 #version 300 es
-
-// This is a fragment shader. If you've opened this file first, please
-// open and read lambert.vert.glsl before reading on.
-// Unlike the vertex shader, the fragment shader actually does compute
-// the shading of geometry. For every pixel in your program's output
-// screen, the fragment shader is run for every bit of geometry that
-// particular pixel overlaps. By implicitly interpolating the position
-// data passed into the fragment shader by the vertex shader, the fragment shader
-// can compute what color to apply to its pixel based on things like vertex
-// position, light position, and vertex color.
 precision highp float;
-
-uniform vec4 u_Color; // The color with which to render this instance of geometry.
-
-// These are the interpolated values out of the rasterizer, so you can't know
-// their specific values without knowing the vertices that contributed to them
-in vec4 fs_Nor;
-in vec4 fs_LightVec;
-in vec4 fs_Col;
-
-out vec4 out_Col; // This is the final output color that you will see on your
-                  // screen for the pixel that is currently being processed.
-
-void main()
-{
-    // Material base color (before shading)
-        vec4 diffuseColor = u_Color;
-
-        // Calculate the diffuse term for Lambert shading
-        float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));
-        // Avoid negative lighting values
-        // diffuseTerm = clamp(diffuseTerm, 0, 1);
-
-        float ambientTerm = 0.2;
-
-        float lightIntensity = diffuseTerm + ambientTerm;   //Add a small float value to the color multiplier
-                                                            //to simulate ambient lighting. This ensures that faces that are not
-                                                            //lit by our point light are not completely black.
-
-        // Compute final shaded color
-        out_Col = vec4(diffuseColor.rgb * lightIntensity, diffuseColor.a);
+uniform float u_Time;
+uniform float u_Scale;
+uniform float u_Temperature;
+uniform float u_Exposure;
+uniform vec3 u_Eye;
+in vec3 fs_Surface;
+in vec3 fs_World;
+in float fs_Heat;
+out vec4 out_Col;
+/* NOISE */
+vec3 fireRamp(float t) {
+  vec3 c=mix(vec3(1.0,1.0,0.98),vec3(1.0,0.98,0.40),smoothstep(0.36,0.55,t));
+  c=mix(c,vec3(1.0,0.64,0.025),smoothstep(0.49,0.66,t));
+  c=mix(c,vec3(0.94,0.23,0.008),smoothstep(0.63,0.80,t));
+  c=mix(c,vec3(0.24,0.038,0.005),smoothstep(0.77,0.94,t));
+  return mix(c,vec3(0.035,0.009,0.004),smoothstep(0.91,1.0,t));
+}
+void main() {
+  float n=fbm(fs_Surface*u_Scale+vec3(0.0,-u_Time*0.65,0.0));
+  // One longitudinal gradient. Noise only softly moves the color boundaries.
+  float t=clamp(fs_Heat+0.085*(n-0.5)-u_Temperature,0.0,1.0);
+  vec3 normal=normalize(cross(dFdx(fs_World),dFdy(fs_World)));
+  float facing=abs(dot(normal,normalize(u_Eye-fs_World)));
+  vec3 color=fireRamp(t);
+  color*=1.0-0.12*(1.0-facing)*smoothstep(0.5,0.85,t);
+  out_Col=vec4(clamp(color*u_Exposure,0.0,1.0),1.0);
 }

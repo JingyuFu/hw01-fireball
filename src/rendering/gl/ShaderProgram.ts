@@ -50,6 +50,20 @@ class ShaderProgram {
     this.unifColor      = gl.getUniformLocation(this.prog, "u_Color");
   }
 
+  uniforms = new Map<string, WebGLUniformLocation>();
+  location(name: string) {
+    if (!this.uniforms.has(name)) this.uniforms.set(name, gl.getUniformLocation(this.prog, name));
+    return this.uniforms.get(name);
+  }
+  setFloat(name: string, value: number) {
+    this.use(); gl.uniform1f(this.location(name), value);
+  }
+  setInt(name: string, value: number) {
+    this.use(); gl.uniform1i(this.location(name), value);
+  }
+  setVec3(name: string, x: number, y: number, z: number) {
+    this.use(); gl.uniform3f(this.location(name), x, y, z);
+  }
   use() {
     if (activeProgram !== this.prog) {
       gl.useProgram(this.prog);
