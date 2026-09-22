@@ -58,3 +58,19 @@ Choose one of the following options:
   - Interfaces https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API
   - Types https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Types
   - Constants https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants
+
+
+## Project Description
+
+This project renders an animated, teardrop-shaped fireball inspired by the reference above. It has a rounded, white-hot head and a tapered tail with many small, irregular flame tips. The color gradually changes from white to yellow, orange, and dark red toward the tail. Procedural noise animates the surface and flame tips, while diagonal streams of fire form the background.
+
+### Completed Requirements
+
+- [x] **Vertex deformation:** Stretch and taper the icosphere into a teardrop, with low-frequency displacement for broad surface motion.
+- [x] **Higher-frequency fBM:** Add smaller-amplitude fractal noise over the broad deformation, with additional directional noise creating the ragged flame tips.
+- [x] **Color gradient linked to displacement:** Pass the geometry's noise values to the fragment shader and combine them with the head-to-tail position to control the color gradient.
+- [x] **Animation in both shaders:** Use a shared time uniform to animate vertex displacement and fragment colors.
+- [x] **At least four toolbox functions:** Use `sin`, `floor`, `fract`, `mix`, `smoothstep`, `clamp`, `abs`, and `pow`.
+- [x] **At least three dat.GUI controls:** Adjust displacement strength, noise scale, fine distortion, octave count, mesh detail, temperature, exposure, glow, and animation speed.
+- [x] **Restore defaults button:** Reset the parameters, camera, and animation time; a separate pause control freezes the animation.
+- [x] **Extra Spice — Background:** Add an animated procedural background with diagonal fire streams and a warm glow.
